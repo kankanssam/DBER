@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>데이터 편향성 탐구 보고서</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts - Inter & Noto Sans KR -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
@@ -41,146 +39,87 @@
 </head>
 <body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
 
-    <!-- 로딩 오버레이 -->
     <div id="loading-overlay" class="fixed inset-0 bg-white bg-opacity-75 flex flex-col items-center justify-center z-50 transition-opacity duration-300">
         <div class="spinner w-16 h-16 rounded-full"></div>
         <p class="mt-4 text-lg font-semibold text-gray-700">데이터 불러오는 중...</p>
     </div>
 
-    <!-- 메인 컨텐츠 컨테이너 -->
     <div class="w-full max-w-4xl mx-auto">
         
-        <!-- 1. 예시 자료 화면 (기본으로 보임) -->
         <div id="example-screen" class="bg-white p-8 md:p-12 rounded-2xl shadow-xl border border-gray-200">
             <h1 class="text-3xl font-bold text-center text-blue-600 mb-4">데이터 편향성 탐구 보고서 (예시)</h1>
             <p class="text-center text-gray-600 mb-10">AI와 데이터를 공부하는 학생들을 위해, 보고서 작성 예시를 준비했습니다.</p>
             
             <div class="space-y-6 text-gray-800">
-                <!-- 예시 1 -->
                 <div>
                     <h2 class="text-xl font-semibold text-gray-900 border-l-4 border-blue-500 pl-3 mb-3">1. 내가 생각하는 데이터 편향성이란?</h2>
                     <p class="p-3 bg-gray-50 rounded-lg border border-gray-200 leading-relaxed">
                         데이터 편향성이란, 인공지능(AI)을 학습시키는 데이터가 현실 세계의 다양성을 골고루 반영하지 못하고 특정 집단에 치우쳐져 있는 상태를 의미합니다. 이러한 편향된 데이터로 학습한 AI는 결국 불공평하거나 차별적인 결정을 내릴 위험이 있습니다.
                     </p>
                 </div>
-
-                <!-- 예시 2 -->
                 <div>
                     <h2 class="text-xl font-semibold text-gray-900 border-l-4 border-blue-500 pl-3 mb-3">2. 데이터 편향성 적용 사례</h2>
                     <p class="p-3 bg-gray-50 rounded-lg border border-gray-200 leading-relaxed">
-                        가장 유명한 사례로 <strong>'AI 얼굴 인식 기술의 인종/성별 편향성'</strong>이 있습니다. MIT 미디어랩의 연구에 따르면, 특정 기업들의 얼굴 인식 AI가 백인 남성의 얼굴은 거의 100%에 가깝게 인식했지만, <strong>피부색이 어두운 여성의 얼굴은 인식률이 65%까지 떨어지는 것</strong>으로 나타났습니다. 이는 AI 학습 데이터셋에 백인 남성의 사진이 압도적으로 많고, 유색 인종 여성의 사진은 부족했기 때문입니다.
-                        <br><br>
-                        또 다른 사례로는 <strong>'아마존의 AI 채용 프로그램'</strong>이 있습니다. 이 AI는 과거 10년간 회사에 제출된 이력서(대부분 남성 개발자)를 기반으로 학습했습니다. 그 결과, AI는 이력서에 '여성'이라는 단어가 포함되거나, '여대' 출신인 경우 감점 처리하는 성차별적인 패턴을 스스로 학습했습니다.
-                    </p>
-                    <!-- 예시 링크 추가 -->
-                    <div class="mt-3 p-3 bg-blue-50 border border-blue-100 rounded-lg">
-                        <span class="font-semibold text-blue-700 text-sm">관련 참고 링크 (예시)</span>
-                        <ul class="list-disc list-inside mt-1 text-sm text-blue-600">
-                            <li>
-                                <span class="font-medium">[얼굴 인식 편향성]</span>
-                                <a href="https://news.mit.edu/2018/study-finds-gender-skin-type-bias-artificial-intelligence-systems-0212" target="_blank" class="underline hover:text-blue-800">
-                                    MIT News: Study finds gender and skin-type bias...
-                                </a>
-                            </li>
-                            <li class="mt-1">
-                                <span class="font-medium">[AI 채용 편향성]</span>
-                                <a href="https://www.chosun.com/site/data/html_dir/2018/10/11/2018101101250.html" target="_blank" class="underline hover:text-blue-800">
-                                    조선일보: "이력서에 '여성' 들어가면 감점"… 아마존 AI 채용, 도입 취소
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <!-- 예시 3 -->
-                <div>
-                    <h2 class="text-xl font-semibold text-gray-900 border-l-4 border-blue-500 pl-3 mb-3">3. 사례 분석 (원인)</h2>
-                    <p class="p-3 bg-gray-50 rounded-lg border border-gray-200 leading-relaxed">
-                        두 사례의 공통적인 원인은 <strong>'데이터의 대표성 부족'</strong>입니다. AI는 입력된 데이터에 존재하는 패턴을 학습할 뿐, 스스로 윤리적 판단을 하지 못합니다. 과거의 성공 사례(남성 개발자)나 쉽게 수집할 수 있는 데이터(백인 남성 사진)가 데이터셋의 대부분을 차지하게 되면, AI는 '과거의 차별'이나 '데이터 불균형' 자체를 '정답'으로 인식하고 이를 증폭시킵니다.
+                        가장 유명한 사례로 <strong>'AI 얼굴 인식 기술의 인종/성별 편향성'</strong>이 있습니다. MIT 미디어랩의 연구에 따르면, 특정 기업들의 얼굴 인식 AI가 백인 남성의 얼굴은 거의 100%에 가깝게 인식했지만, <strong>피부색이 어두운 여성의 얼굴은 인식률이 65%까지 떨어지는 것</strong>으로 나타났습니다.
                     </p>
                 </div>
-                
-                <!-- 예시 4 -->
-                <div>
-                    <h2 class="text-xl font-semibold text-gray-900 border-l-4 border-blue-500 pl-3 mb-3">4. 나의 생각 및 해결 방법</h2>
-                    <p class="p-3 bg-gray-50 rounded-lg border border-gray-200 leading-relaxed">
-                        AI가 사회 깊숙이 들어오는 만큼, 개발 단계부터 데이터 편향성을 심각하게 고민해야 한다고 생각합니다.
-                        <br><br>
-                        <strong>해결 방법:</strong><br>
-                        1. <strong>다양성 있는 데이터셋 구축:</strong> 의식적으로 다양한 인종, 성별, 연령대의 데이터를 균형 있게 수집하고 포함시키려는 노력이 필요합니다.<br>
-                        2. <strong>지속적인 감사 및 모니터링:</strong> AI가 배포된 이후에도 특정 집단에게 불리하게 작동하지 않는지 정기적으로 감사하고, 편향성이 발견되면 즉시 재학습 및 수정해야 합니다.<br>
-                        3. <strong>개발팀의 다양성 확보:</strong> AI를 개발하는 팀 자체에 다양한 배경의 사람들이 포함된다면, 데이터 수집 단계에서부터 놓칠 수 있는 편향성을 미리 발견하고 논의할 수 있을 것입니다.
-                    </p>
-                </div>
-            </div>
+                 </div>
 
-            <!-- 보고서 작성 시작 버튼 -->
+
             <button id="start-report-btn" class="mt-10 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg py-4 px-6 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
                 보고서 작성 시작하기
             </button>
         </div>
         
-        <!-- 2. 보고서 작성 화면 (기본으로 숨겨져 있음) -->
         <div id="report-screen" class="hidden w-full max-w-4xl mx-auto bg-white p-8 md:p-12 rounded-2xl shadow-xl border border-gray-200">
             <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">데이터 편향성 탐구 보고서</h1>
             
-            <!-- 보고서 폼 -->
             <form id="report-form" class="space-y-6">
                 
-                <!-- 학번 / 이름 입력란 -->
                 <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mb-6">
-                    <!-- 학번 -->
                     <div class="flex-1">
                         <label for="student-id" class="block text-lg font-semibold text-gray-700 mb-2">학번</label>
-                        <input type="text" id="student-id" name="student-id" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="예: 10101">
+                        <input type="text" id="student-id" name="student-id" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="예: 10101" required>
                     </div>
-                    <!-- 이름 -->
                     <div class="flex-1">
                         <label for="student-name" class="block text-lg font-semibold text-gray-700 mb-2">이름</label>
-                        <input type="text" id="student-name" name="student-name" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="예: 홍길동">
+                        <input type="text" id="student-name" name="student-name" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="예: 홍길동" required>
                     </div>
                 </div>
                 
-                <!-- 구분선 -->
                 <hr class="border-gray-200">
 
-                <!-- 1. 데이터 편향성이란? -->
                 <div>
                     <label for="definition" class="block text-lg font-semibold text-gray-700 mb-2">1. 내가 생각하는 데이터 편향성이란?</label>
-                    <textarea id="definition" name="definition" rows="4" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="데이터 편향성에 대한 자신의 정의를 자유롭게 작성해 주세요."></textarea>
+                    <textarea id="definition" name="definition" rows="4" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="데이터 편향성에 대한 자신의 정의를 자유롭게 작성해 주세요." required></textarea>
                 </div>
                 
-                <!-- 2. 데이터 편향성 적용 사례 -->
                 <div>
                     <label for="examples" class="block text-lg font-semibold text-gray-700 mb-2">2. 데이터 편향성 적용 사례</label>
-                    <textarea id="examples" name="examples" rows="6" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="데이터 편향성이 적용된 실제 사례를 조사하여 작성해 주세요. (예: AI 채용, 얼굴 인식 등)"></textarea>
+                    <textarea id="examples" name="examples" rows="6" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="데이터 편향성이 적용된 실제 사례를 조사하여 작성해 주세요. (예: AI 채용, 얼굴 인식 등)" required></textarea>
                 </div>
                 
-                <!-- 2-1. 관련 참고 링크 -->
                 <div>
                     <label for="example-links" class="block text-lg font-semibold text-gray-700 mb-2">관련 참고 링크 (선택)</label>
                     <textarea id="example-links" name="example-links" rows="3" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="조사한 사례와 관련된 뉴스 기사나 자료의 URL을 입력해 주세요. (여러 개일 경우 줄바꿈하여 입력)"></textarea>
                 </div>
                 
-                <!-- 3. 사례 분석 -->
                 <div>
                     <label for="analysis" class="block text-lg font-semibold text-gray-700 mb-2">3. 사례 분석 (원인)</label>
-                    <textarea id="analysis" name="analysis" rows="5" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="해당 사례가 발생한 원인은 무엇이라고 생각하나요? (데이터 수집 과정, 알고리즘의 한계 등)"></textarea>
+                    <textarea id="analysis" name="analysis" rows="5" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="해당 사례가 발생한 원인은 무엇이라고 생각하나요? (데이터 수집 과정, 알고리즘의 한계 등)" required></textarea>
                 </div>
                 
-                <!-- 4. 나의 생각 및 해결 방법 -->
                 <div>
                     <label for="solutions" class="block text-lg font-semibold text-gray-700 mb-2">4. 나의 생각 및 해결 방법</label>
-                    <textarea id="solutions" name="solutions" rows="6" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="데이터 편향성을 해결하기 위한 본인만의 생각이나 아이디어를 작성해 주세요."></textarea>
+                    <textarea id="solutions" name="solutions" rows="6" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="데이터 편향성을 해결하기 위한 본인만의 생각이나 아이디어를 작성해 주세요." required></textarea>
                 </div>
                 
-                <!-- 저장 버튼 및 피드백 -->
+                
                 <div class="flex items-center justify-between pt-4">
                     <button type="submit" id="save-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                        저장하기 (클라우드 & Google Sheets)
+                        제출하기
                     </button>
-                    <!-- 제출 완료 메시지 -->
-                    <span id="save-feedback" class="text-green-600 font-semibold opacity-0 save-feedback">
+                    <span id="save-feedback" class="font-semibold opacity-0 save-feedback">
                         ✓ 제출되었습니다!
                     </span>
                 </div>
@@ -188,44 +127,10 @@
         </div>
     </div>
 
-    <!-- Firebase SDK (반드시 11.x 버전 사용) -->
     <script type="module">
-        // Firebase 앱 초기화
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        // Firebase 인증
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        // Firestore
-        import { getFirestore, doc, setDoc, getDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // --- Firebase 설정 (GitHub Pages 용) ---
-
-        // !!! (필수) GitHub Pages 배포용 Firebase 설정 !!!
-        // 'standalone_firebase_setup.md' 가이드 또는 이전 안내(API 키 폐기/재발급)를 따라
-        // Google Cloud 콘솔에서 *새로 발급받고 도메인 제한을 설정한* API 키와
-        // 선생님의 Firebase 프로젝트 정보를 아래 객체에 붙여넣으세요.
-        const firebaseConfig = {
-            apiKey: "AIzaSyCZQMhEYsAWFZoJttsghGDEbofZdCR8jns",
-            authDomain: "data-bias-report-project.firebaseapp.com",
-            projectId: "data-bias-report-project",
-            storageBucket: "data-bias-report-project.firebasestorage.app",
-            messagingSenderId: "711965823815",
-            appId: "1:711965823815:web:c7dbcad277f798732b7262",
-            measurementId: "G-YY9V8KJYFS"
-        };
-
-        // !!! --- 설정 끝 --- !!!
-
-
-        // --- Google Apps Script 설정 ---
-        // 'google_apps_script_setup.md' 가이드의 5단계에서 복사한
-        // Google Apps Script 웹 앱 URL을 여기에 붙여넣으세요.
-        // (Google Sheets 연동 기능을 사용하지 않으려면 이대로 두셔도 됩니다.)
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzmF6HYRm_J_aWnOmv2FIcRVmcJeYzfhMu7rrJFefadzhCXEBvEa7AtS09PoO5Zdo-RQw/exec';
-        // --- 설정 끝 ---
-
-
-        let app, auth, db;
-        let currentUserId = null; // 현재 사용자 ID
+        // --- 1. 여기에 2단계에서 복사한 웹 앱 URL을 붙여넣으세요 ---
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby_9dnFIo3qvxXbQI2e7EsmxRic0omEL06X6qAQOpTGhMcEcv9ZhxKVGxbIqrI8hXPB2w/exec"; 
+        // 예: const WEB_APP_URL = "https://script.google.com/macros/s/AKf.../exec";
 
         // --- DOM 요소 ---
         const loadingOverlay = document.getElementById('loading-overlay');
@@ -235,200 +140,100 @@
         const reportForm = document.getElementById('report-form');
         const saveButton = document.getElementById('save-button');
         const saveFeedback = document.getElementById('save-feedback');
-        
-        // 폼 입력 요소
-        const definitionInput = document.getElementById('definition');
-        const examplesInput = document.getElementById('examples');
-        const exampleLinksInput = document.getElementById('example-links');
-        const analysisInput = document.getElementById('analysis');
-        const solutionsInput = document.getElementById('solutions');
-        const studentIdInput = document.getElementById('student-id');
-        const studentNameInput = document.getElementById('student-name');
 
-        // Firestore 문서 경로 생성 (GitHub Pages 용 단순화 버전)
-        function getReportDocRef(userId) {
-            // 'standalone_firebase_setup.md' 가이드의 5단계 규칙 설정이 필요합니다.
-            // (Firestore 보안 규칙: /reports/{userId}/...)
-            return doc(db, 'reports', userId); 
-        }
-
-        // Firestore에서 데이터 불러오기
-        async function loadReport(userId) {
-            if (!userId || !db) return;
-            console.log(`[Firestore] ${userId} 사용자의 보고서 불러오기 시도...`);
-            
-            const docRef = getReportDocRef(userId);
-            
-            try {
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    
-                    definitionInput.value = data.definition || '';
-                    examplesInput.value = data.examples || '';
-                    exampleLinksInput.value = data.exampleLinks || '';
-                    analysisInput.value = data.analysis || '';
-                    solutionsInput.value = data.solutions || '';
-                    studentIdInput.value = data.studentId || '';
-                    studentNameInput.value = data.studentName || '';
-                    
-                } else {
-                    console.log("[Firestore] 기존 문서 없음. 새 문서가 생성됩니다.");
-                    reportForm.reset(); // 폼을 깨끗하게 리셋
-                }
-            } catch (error) {
-                console.error("[Firestore] 데이터 불러오기 오류:", error);
-            } finally {
-                // 데이터 로드 완료 후 로딩 오버레이 숨기기
-                loadingOverlay.classList.add('opacity-0');
-                setTimeout(() => loadingOverlay.style.display = 'none', 300);
-            }
-        }
-
-        // Firestore에 데이터 저장하기
-        async function saveReport(event) {
+        // [수정됨] '제출하기' - Google Sheet로 전송하는 함수
+        async function submitReport(event) {
             event.preventDefault(); // 폼 기본 제출 방지
-            
-            if (!currentUserId || !db) {
-                console.warn("Firestore가 준비되지 않았습니다. 저장 실패.");
+
+            // URL이 입력되었는지 확인
+            if (WEB_APP_URL === "여기에_2단계에서_복사한_URL을_붙여넣으세요") {
+                alert("HTML 파일의 WEB_APP_URL 변수에 2단계에서 복사한 Apps Script URL을 입력해야 합니다.");
                 return;
             }
 
-            console.log("[Firestore] 보고서 저장 시도...");
-            const docRef = getReportDocRef(currentUserId);
-            
-            const reportData = {
-                studentId: studentIdInput.value,
-                studentName: studentNameInput.value,
-                // ... (reportData 내용)
-                lastUpdated: new Date().toISOString() // 마지막 저장 시간
-            };
-            
             // 버튼 비활성화 및 로딩 상태 표시
             saveButton.disabled = true;
-            saveButton.textContent = '저장 중...';
-            saveFeedback.classList.add('opacity-0'); // 피드백 숨기기
+            saveButton.textContent = '제출 중...';
+            saveFeedback.classList.remove('text-green-600', 'text-red-600');
+            saveFeedback.classList.add('opacity-0');
 
-            let saveSuccess = false; // <<< [수정됨] 성공 여부 플래그
+            // FormData 객체를 사용하여 폼 데이터 캡처
+            const formData = new FormData(reportForm);
 
             try {
-                // setDoc에 { merge: true } 옵션을 주어 문서를 덮어쓰지 않고 병합
-                await setDoc(docRef, reportData, { merge: true });
-                console.log("[Firestore] 보고서 저장 성공!");
+                // fetch API를 사용하여 Google Apps Script URL로 POST 요청 전송
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: formData,
+                });
 
-                // --- NEW: Google Sheets로 데이터 전송 ---
-                if (GOOGLE_SCRIPT_URL.startsWith('https://script.google.com')) {
-                    // ... (Google Sheets 전송 로직)
-                } else if (GOOGLE_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
-                    console.warn("[Google Sheets] 스크립트 URL이 설정되지 않아 Google Sheet로의 전송을 건너뜁니다.");
-                }
-                // --- END: Google Sheets 전송 ---
+                const result = await response.json();
 
-                saveSuccess = true; // <<< [수정됨] 성공 플래그 설정
-                saveFeedback.textContent = "제출되었습니다."; // <<< [수정됨] 메시지 변경
-                saveButton.textContent = '제출 완료'; // <<< [수정됨] 버튼 텍스트
-                saveButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                saveButton.classList.add('bg-green-600'); // <<< [수정됨] 버튼 초록색으로
-                saveFeedback.classList.remove('opacity-0');
+                if (result.result === "success") {
+                    // 성공 UI 표시
+                    saveFeedback.textContent = "✓ 제출되었습니다!";
+                    saveFeedback.classList.add('text-green-600');
+                    saveButton.textContent = '제출 완료';
+                    saveButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                    saveButton.classList.add('bg-green-600');
+                    saveFeedback.classList.remove('opacity-0');
 
-            } catch (error) {
-                console.error("[Firestore] 저장 오류:", error);
-                saveSuccess = false; // <<< [수정됨] 실패 플래그 설정
-                saveButton.textContent = '저장 실패 (콘솔 확인)';
-                saveButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                saveButton.classList.add('bg-red-600');
-                saveFeedback.textContent = '제출 실패 (콘솔 확인)'; // <<< [수정됨] 피드백 메시지
-                saveFeedback.classList.remove('opacity-0'); // <<< [수정됨] 피드백 보이기
-
-            } finally {
-                // 3초 후 버튼/화면 처리
-                setTimeout(() => {
-                    if (saveSuccess) { // <<< [수정됨] 성공했을 경우
+                    // 3초 후 화면 전환 및 폼 초기화
+                    setTimeout(() => {
                         // 1. 화면 전환
                         reportScreen.classList.add('hidden');
                         exampleScreen.classList.remove('hidden');
                         window.scrollTo(0, 0);
                         
-                        // 2. 폼 초기화
+                        // 2. 폼 초기화 (요청 사항)
                         reportForm.reset();
                         
-                        // 3. 버튼 및 피드백 메시지 원상 복구 (다음 제출을 위해)
+                        // 3. 버튼 및 피드백 메시지 원상 복구
                         saveButton.disabled = false;
-                        saveButton.textContent = '저장하기 (클라우드 & Google Sheets)';
-                        saveFeedback.textContent = '✓ 저장 완료!'; // 원래 텍스트로
+                        saveButton.textContent = '제출하기';
                         saveFeedback.classList.add('opacity-0');
-                        saveButton.classList.remove('bg-green-600'); // 성공색 제거
+                        saveButton.classList.remove('bg-green-600');
                         saveButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
 
-                    } else { // <<< [수정됨] 실패했을 경우
-                        // 화면을 전환하지 않고, 버튼만 다시 시도할 수 있도록 복구
-                        saveButton.disabled = false;
-                        saveButton.textContent = '저장하기 (클라우드 & Google Sheets)';
-                        saveFeedback.classList.add('opacity-0');
-                        saveButton.classList.remove('bg-red-600'); // 실패색 제거
-                        saveButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                    }
-                }, 3000); // 3초 대기
+                    }, 3000); // 3초 대기
+
+                } else {
+                    // 실패 UI 표시
+                    throw new Error(result.message || "알 수 없는 오류 발생");
+                }
+
+            } catch (error) {
+                // 오류 처리
+                console.error("데이터 제출 실패:", error);
+                saveFeedback.textContent = "제출 실패. (콘솔 확인)";
+                saveFeedback.classList.add('text-red-600'); // 빨간색
+                saveFeedback.classList.remove('opacity-0');
+                saveButton.disabled = false;
+                saveButton.textContent = '다시 시도';
             }
         }
         
-        // --- 앱 초기화 실행 (GitHub Pages 용 단순화 버전) ---
-        function initializeAppAndAuth() {
-            // apiKey가 유효한지, 그리고 기본값("YOUR_...")이 아닌지 확인
-            if (!firebaseConfig || !firebaseConfig.apiKey || firebaseConfig.apiKey.startsWith("YOUR_")) {
-                console.error("Firebase 설정이 유효하지 않습니다. HTML 파일의 `firebaseConfig` 객체를 확인하세요.");
-                // 로딩 오버레이에 오류 메시지 표시
-                loadingOverlay.innerHTML = '<p class="text-red-500 font-semibold text-center p-4">Firebase 연결 실패.<br>관리자에게 문의하거나<br>HTML 파일의 `firebaseConfig` 설정을 확인하세요.</p>';
-                return; // 초기화 중단
-            }
-
-            try {
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                // setLogLevel('debug'); // Firestore 상세 로그 확인 시 주석 해제
-                console.log("Firebase 앱 초기화 성공 (독립 실행 모드)");
-
-                // 인증 상태 감지
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        // 이미 익명 로그인된 사용자
-                        console.log("로그인 사용자:", user.uid);
-                        currentUserId = user.uid;
-                        await loadReport(currentUserId);
-                    } else {
-                        // 로그인되지 않은 상태 -> 익명 로그인 시도
-                        console.log("로그인 사용자 없음. 익명으로 로그인 시도...");
-                        try {
-                            await signInAnonymously(auth);
-                            // (로그인 성공 시 onAuthStateChanged가 다시 호출되어 user 블록이 실행됨)
-                        } catch (error) {
-                            console.error("익명 로그인 실패:", error);
-                            loadingOverlay.innerHTML = '<p class="text-red-500 font-semibold">인증 실패. 페이지를 새로고침해 주세요.</p>';
-                        }
-                    }
-                });
-
-            } catch (error) {
-                console.error("Firebase 초기화 중 심각한 오류:", error);
-                loadingOverlay.innerHTML = '<p class="text-red-500 font-semibold">앱 초기화 실패. 관리자에게 문의하세요.</p>';
-            }
+        // 앱 초기화 함수 (로딩 오버레이만 숨김)
+        function initializeAppLocal() {
+            loadingOverlay.classList.add('opacity-0');
+            setTimeout(() => loadingOverlay.style.display = 'none', 300);
         }
 
         // --- 이벤트 리스너 ---
         
+        // '보고서 작성 시작하기' 버튼 클릭
         startReportBtn.addEventListener('click', () => {
             exampleScreen.classList.add('hidden');
             reportScreen.classList.remove('hidden');
             window.scrollTo(0, 0); 
         });
 
-        reportForm.addEventListener('submit', saveReport);
+        // [수정됨] '제출하기' 버튼 클릭 시 submitReport 함수 호출
+        reportForm.addEventListener('submit', submitReport);
         
-        // DOM이 준비되면 Firebase 초기화 시작
-        document.addEventListener('DOMContentLoaded', initializeAppAndAuth);
+        // DOM이 준비되면 로컬 앱 초기화 시작
+        document.addEventListener('DOMContentLoaded', initializeAppLocal);
         
     </script>
 </body>
 </html>
-
