@@ -6,12 +6,12 @@
     <title>데이터 편향성 탐구 보고서</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts - Inter -->
+    <!-- Google Fonts - Inter & Noto Sans KR -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* Noto Sans KR 폰트를 기본으로 사용하고, Inter 폰트를 대체 폰트로 지정 */
+        /* Noto Sans KR 폰트를 기본으로 사용 */
         body {
             font-family: 'Noto Sans KR', 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
@@ -22,7 +22,7 @@
             to { transform: rotate(360deg); }
         }
         .spinner {
-            border-width: 4px; /* 테두리 두께 증가 */
+            border-width: 4px;
             border-color: transparent;
             border-top-color: #3b82f6; /* 파란색 */
             animation: spin 1s linear infinite;
@@ -193,17 +193,16 @@
         // Firebase 앱 초기화
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         // Firebase 인증
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         // Firestore
         import { getFirestore, doc, setDoc, getDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        GITHUB_PAGES_FIREBASE_CONFIG
 
-        // --- Firebase 설정 ---
+        // --- Firebase 설정 (GitHub Pages 용) ---
 
         // !!! (필수) GitHub Pages 배포용 Firebase 설정 !!!
-        // 캔버스 환경 외부(예: GitHub Pages)에서 이 앱을 실행하려면
-        // 'standalone_firebase_setup.md' 가이드를 따라 Firebase 프로젝트를 생성하고,
-        // 2단계에서 복사한 'firebaseConfig' 객체를 아래 변수에 붙여넣으세요.
+        // 'standalone_firebase_setup.md' 가이드 또는 이전 안내(API 키 폐기/재발급)를 따라
+        // Google Cloud 콘솔에서 *새로 발급받고 도메인 제한을 설정한* API 키와
+        // 선생님의 Firebase 프로젝트 정보를 아래 객체에 붙여넣으세요.
         const firebaseConfig = {
             apiKey: "AIzaSyCZQMhEYsAWFZoJttsghGDEbofZdCR8jns",
             authDomain: "data-bias-report-project.firebaseapp.com",
@@ -217,33 +216,14 @@
         // !!! --- 설정 끝 --- !!!
 
 
-        // __firebase_config는 캔버스 환경에서 자동으로 제공됩니다.
-        let finalFirebaseConfig;
-        let isCanvasEnvironment = false; // 캔버스 환경인지 확인하는 플래그
+        // --- Google Apps Script 설정 ---
+        // 'google_apps_script_setup.md' 가이드의 5단계에서 복사한
+        // Google Apps Script 웹 앱 URL을 여기에 붙여넣으세요.
+        // (Google Sheets 연동 기능을 사용하지 않으려면 이대로 두셔도 됩니다.)
+        const GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+        // --- 설정 끝 ---
 
-        try {
-            // __firebase_config가 정의되어 있고, 빈 객체가 아닌지 확인
-            if (typeof __firebase_config !== 'undefined' && __firebase_config !== '{}' && __firebase_config.length > 10) {
-                // 1. 캔버스 환경일 경우
-                console.log("캔버스 환경 감지. __firebase_config 사용.");
-                firebaseConfig = JSON.parse(__firebase_config);
-                isCanvasEnvironment = true;
-            } else {
-                // 2. 캔버스 환경이 아닐 경우 (예: GitHub Pages)
-                console.log("캔버스 환경 아님. GITHUB_PAGES_FIREBASE_CONFIG 사용.");
-                firebaseConfig = GITHUB_PAGES_FIREBASE_CONFIG;
-                isCanvasEnvironment = false;
-            }
-        } catch (e) {
-            console.error("Firebase config 처리 오류. GitHub Pages 설정을 사용합니다.", e);
-            firebaseConfig = GITHUB_PAGES_FIREBASE_CONFIG; // 파싱 오류 시에도 GitHub 설정 사용
-            isCanvasEnvironment = false;
-        }
 
-        // __app_id는 캔버스 환경에서 자동으로 제공됩니다.
-        // 캔버스 환경이 아닐 경우, Firebase config의 projectId를 고유 ID로 사용합니다.
-        const appId = typeof __app_id !== 'undefined' ? __app_id : (firebaseConfig.projectId || 'default-data-bias-app');
-        
         let app, auth, db;
         let currentUserId = null; // 현재 사용자 ID
 
@@ -265,21 +245,11 @@
         const studentIdInput = document.getElementById('student-id');
         const studentNameInput = document.getElementById('student-name');
 
-        // Firestore 문서 경로 생성
+        // Firestore 문서 경로 생성 (GitHub Pages 용 단순화 버전)
         function getReportDocRef(userId) {
-            if (isCanvasEnvironment) {
-                // 1. 캔버스 환경일 경우 (기존 경로)
-                // (Firestore 보안 규칙: /artifacts/{appId}/users/{userId}/...)
-                console.log("경로: 캔버스 환경 경로 사용");
-                return doc(db, 'artifacts', appId, 'users', userId, 'report', 'data_bias_v1');
-            } else {
-                // 2. 독립 실행 환경(GitHub Pages 등)일 경우 (새로운 간단한 경로)
-                // (Firestore 보안 규칙: /reports/{userId}/...)
-                // 'standalone_firebase_setup.md' 가이드의 5단계 규칙 설정이 필요합니다.
-                console.log("경로: 독립 실행 환경 경로 사용");
-                // userId별로 문서를 만들고, 그 안에 데이터를 객체로 저장합니다.
-                return doc(db, 'reports', userId); 
-            }
+            // 'standalone_firebase_setup.md' 가이드의 5단계 규칙 설정이 필요합니다.
+            // (Firestore 보안 규칙: /reports/{userId}/...)
+            return doc(db, 'reports', userId); 
         }
 
         // Firestore에서 데이터 불러오기
@@ -294,12 +264,6 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     
-                    // Firestore 경로 구조 변경에 따른 데이터 접근 수정
-                    // 캔버스: data.definition
-                    // 독립: data.bias_v1.definition (getReportDocRef에서 경로 수정함)
-                    // -> getReportDocRef를 수정하여 동일한 문서 구조를 갖도록 변경 (reports/{userId})
-                    //    저장 시에도 해당 문서에 모든 데이터를 저장하도록 함.
-                    
                     definitionInput.value = data.definition || '';
                     examplesInput.value = data.examples || '';
                     exampleLinksInput.value = data.exampleLinks || '';
@@ -310,7 +274,6 @@
                     
                 } else {
                     console.log("[Firestore] 기존 문서 없음. 새 문서가 생성됩니다.");
-                    // 새 사용자인 경우 폼 비우기
                     reportForm.reset(); // 폼을 깨끗하게 리셋
                 }
             } catch (error) {
@@ -356,8 +319,6 @@
                 console.log("[Firestore] 보고서 저장 성공!");
 
                 // --- NEW: Google Sheets로 데이터 전송 ---
-                const GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
-
                 if (GOOGLE_SCRIPT_URL.startsWith('https://script.google.com')) {
                     const sheetData = {
                         timestamp: new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }),
@@ -381,17 +342,16 @@
                             redirect: 'follow'
                         });
                         
-                        if (response.type === 'opaque' || response.type === 'opaqueredirect') {
-                             console.log("[Google Sheets] 데이터 전송 요청 완료 (Opaque 응답)");
+                        // Google Apps Script는 redirect(302) 후 opaque 응답을 반환할 수 있음
+                        if (response.type === 'opaque' || response.type === 'opaqueredirect' || response.ok) {
+                            console.log("[Google Sheets] 데이터 전송 요청 완료.");
                         } else {
-                            const result = await response.json();
-                            if (result.status === 'success') {
-                                console.log("[Google Sheets] 데이터 전송 성공.");
-                            } else {
-                                console.warn("[Google Sheets] 스크립트 오류:", result.message);
-                            }
+                             // CORS 오류 등이 아닌, 실제 스크립트 실행 오류를 잡기 위함
+                            const result = await response.json().catch(() => ({})); // json 파싱 실패 대비
+                            console.warn("[Google Sheets] 스크립트 오류:", result.message || response.statusText);
                         }
                     } catch (sheetError) {
+                        // 네트워크 오류 또는 CORS 정책 위반 (CORS는 보통 브라우저 콘솔에 별도 오류로 표시됨)
                         console.error("[Google Sheets] 전송 중 오류 발생:", sheetError);
                     }
                 } else if (GOOGLE_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
@@ -403,23 +363,31 @@
 
             } catch (error) {
                 console.error("[Firestore] 저장 오류:", error);
-                alert("저장에 실패했습니다. 인터넷 연결을 확인하고 다시 시도해 주세요.");
+                // alert() 대신 커스텀 UI 사용이 권장되나, 긴급 알림용으로 alert 사용
+                // (실제 환경에서는 alert가 비동기/iframe 이슈로 작동 안 할 수 있음)
+                saveButton.textContent = '저장 실패 (콘솔 확인)';
+                saveButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                saveButton.classList.add('bg-red-600');
+
             } finally {
-                saveButton.disabled = false;
-                saveButton.textContent = '저장하기 (클라우드 & Google Sheets)';
+                // 3초 후 버튼 원래대로 복구
                 setTimeout(() => {
+                    saveButton.disabled = false;
+                    saveButton.textContent = '저장하기 (클라우드 & Google Sheets)';
                     saveFeedback.classList.add('opacity-0');
+                    saveButton.classList.remove('bg-red-600');
+                    saveButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
                 }, 3000);
             }
         }
         
-        // --- 앱 초기화 실행 ---
+        // --- 앱 초기화 실행 (GitHub Pages 용 단순화 버전) ---
         function initializeAppAndAuth() {
             // apiKey가 유효한지, 그리고 기본값("YOUR_...")이 아닌지 확인
             if (!firebaseConfig || !firebaseConfig.apiKey || firebaseConfig.apiKey.startsWith("YOUR_")) {
-                console.error("Firebase 설정이 유효하지 않습니다. GITHUB_PAGES_FIREBASE_CONFIG를 확인하세요.");
+                console.error("Firebase 설정이 유효하지 않습니다. HTML 파일의 `firebaseConfig` 객체를 확인하세요.");
                 // 로딩 오버레이에 오류 메시지 표시
-                loadingOverlay.innerHTML = '<p class="text-red-500 font-semibold text-center p-4">Firebase 연결 실패.<br>관리자에게 문의하거나<br>HTML 파일의 `GITHUB_PAGES_FIREBASE_CONFIG` 설정을 확인하세요.</p>';
+                loadingOverlay.innerHTML = '<p class="text-red-500 font-semibold text-center p-4">Firebase 연결 실패.<br>관리자에게 문의하거나<br>HTML 파일의 `firebaseConfig` 설정을 확인하세요.</p>';
                 return; // 초기화 중단
             }
 
@@ -427,29 +395,24 @@
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
-                // setLogLevel('debug'); 
-                console.log("Firebase 앱 초기화 성공 (환경: " + (isCanvasEnvironment ? "캔버스" : "독립 실행") + ")");
+                // setLogLevel('debug'); // Firestore 상세 로그 확인 시 주석 해제
+                console.log("Firebase 앱 초기화 성공 (독립 실행 모드)");
 
                 // 인증 상태 감지
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
+                        // 이미 익명 로그인된 사용자
                         console.log("로그인 사용자:", user.uid);
                         currentUserId = user.uid;
                         await loadReport(currentUserId);
                     } else {
-                        console.log("로그인 사용자 없음. 로그인 시도...");
+                        // 로그인되지 않은 상태 -> 익명 로그인 시도
+                        console.log("로그인 사용자 없음. 익명으로 로그인 시도...");
                         try {
-                            // 캔버스 환경이고 커스텀 토큰이 있다면 사용
-                            if (isCanvasEnvironment && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                                console.log("커스텀 토큰으로 로그인 시도...");
-                                await signInWithCustomToken(auth, __initial_auth_token);
-                            } else {
-                                // 캔버스 환경이 아니거나 토큰이 없으면 익명 로그인
-                                console.log("익명으로 로그인 시도...");
-                                await signInAnonymously(auth);
-                            }
+                            await signInAnonymously(auth);
+                            // (로그인 성공 시 onAuthStateChanged가 다시 호출되어 user 블록이 실행됨)
                         } catch (error) {
-                            console.error("로그인 실패:", error);
+                            console.error("익명 로그인 실패:", error);
                             loadingOverlay.innerHTML = '<p class="text-red-500 font-semibold">인증 실패. 페이지를 새로고침해 주세요.</p>';
                         }
                     }
@@ -471,6 +434,7 @@
 
         reportForm.addEventListener('submit', saveReport);
         
+        // DOM이 준비되면 Firebase 초기화 시작
         document.addEventListener('DOMContentLoaded', initializeAppAndAuth);
         
     </script>
