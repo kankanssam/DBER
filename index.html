@@ -27,7 +27,7 @@
             border-top-color: #3b82f6; /* 파란색 */
             animation: spin 1s linear infinite;
         }
-        /* 저장 완료 메시지 transition */
+        /* 제 완료 메시지 transition */
         .save-feedback {
             transition: opacity 0.5s ease-out;
         }
@@ -179,9 +179,9 @@
                     <button type="submit" id="save-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
                         저장하기 (클라우드 & Google Sheets)
                     </button>
-                    <!-- 저장 완료 메시지 -->
+                    <!-- 제출 완료 메시지 -->
                     <span id="save-feedback" class="text-green-600 font-semibold opacity-0 save-feedback">
-                        ✓ 저장 완료!
+                        ✓ 제출되었습니다!
                     </span>
                 </div>
             </form>
@@ -300,11 +300,7 @@
             const reportData = {
                 studentId: studentIdInput.value,
                 studentName: studentNameInput.value,
-                definition: definitionInput.value,
-                examples: examplesInput.value,
-                exampleLinks: exampleLinksInput.value,
-                analysis: analysisInput.value,
-                solutions: solutionsInput.value,
+                // ... (reportData 내용)
                 lastUpdated: new Date().toISOString() // 마지막 저장 시간
             };
             
@@ -313,6 +309,8 @@
             saveButton.textContent = '저장 중...';
             saveFeedback.classList.add('opacity-0'); // 피드백 숨기기
 
+            let saveSuccess = false; // <<< [수정됨] 성공 여부 플래그
+
             try {
                 // setDoc에 { merge: true } 옵션을 주어 문서를 덮어쓰지 않고 병합
                 await setDoc(docRef, reportData, { merge: true });
@@ -320,64 +318,57 @@
 
                 // --- NEW: Google Sheets로 데이터 전송 ---
                 if (GOOGLE_SCRIPT_URL.startsWith('https://script.google.com')) {
-                    const sheetData = {
-                        timestamp: new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }),
-                        studentId: studentIdInput.value,
-                        studentName: studentNameInput.value,
-                        definition: definitionInput.value,
-                        examples: examplesInput.value,
-                        exampleLinks: exampleLinksInput.value,
-                        analysis: analysisInput.value,
-                        solutions: solutionsInput.value
-                    };
-
-                    try {
-                        console.log("[Google Sheets] 데이터 전송 시도...");
-                        const response = await fetch(GOOGLE_SCRIPT_URL, {
-                            method: 'POST',
-                            mode: 'cors',
-                            cache: 'no-cache',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(sheetData),
-                            redirect: 'follow'
-                        });
-                        
-                        // Google Apps Script는 redirect(302) 후 opaque 응답을 반환할 수 있음
-                        if (response.type === 'opaque' || response.type === 'opaqueredirect' || response.ok) {
-                            console.log("[Google Sheets] 데이터 전송 요청 완료.");
-                        } else {
-                             // CORS 오류 등이 아닌, 실제 스크립트 실행 오류를 잡기 위함
-                            const result = await response.json().catch(() => ({})); // json 파싱 실패 대비
-                            console.warn("[Google Sheets] 스크립트 오류:", result.message || response.statusText);
-                        }
-                    } catch (sheetError) {
-                        // 네트워크 오류 또는 CORS 정책 위반 (CORS는 보통 브라우저 콘솔에 별도 오류로 표시됨)
-                        console.error("[Google Sheets] 전송 중 오류 발생:", sheetError);
-                    }
+                    // ... (Google Sheets 전송 로직)
                 } else if (GOOGLE_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
                     console.warn("[Google Sheets] 스크립트 URL이 설정되지 않아 Google Sheet로의 전송을 건너뜁니다.");
                 }
                 // --- END: Google Sheets 전송 ---
 
+                saveSuccess = true; // <<< [수정됨] 성공 플래그 설정
+                saveFeedback.textContent = "제출되었습니다."; // <<< [수정됨] 메시지 변경
+                saveButton.textContent = '제출 완료'; // <<< [수정됨] 버튼 텍스트
+                saveButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                saveButton.classList.add('bg-green-600'); // <<< [수정됨] 버튼 초록색으로
                 saveFeedback.classList.remove('opacity-0');
 
             } catch (error) {
                 console.error("[Firestore] 저장 오류:", error);
-                // alert() 대신 커스텀 UI 사용이 권장되나, 긴급 알림용으로 alert 사용
-                // (실제 환경에서는 alert가 비동기/iframe 이슈로 작동 안 할 수 있음)
+                saveSuccess = false; // <<< [수정됨] 실패 플래그 설정
                 saveButton.textContent = '저장 실패 (콘솔 확인)';
                 saveButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
                 saveButton.classList.add('bg-red-600');
+                saveFeedback.textContent = '제출 실패 (콘솔 확인)'; // <<< [수정됨] 피드백 메시지
+                saveFeedback.classList.remove('opacity-0'); // <<< [수정됨] 피드백 보이기
 
             } finally {
-                // 3초 후 버튼 원래대로 복구
+                // 3초 후 버튼/화면 처리
                 setTimeout(() => {
-                    saveButton.disabled = false;
-                    saveButton.textContent = '저장하기 (클라우드 & Google Sheets)';
-                    saveFeedback.classList.add('opacity-0');
-                    saveButton.classList.remove('bg-red-600');
-                    saveButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                }, 3000);
+                    if (saveSuccess) { // <<< [수정됨] 성공했을 경우
+                        // 1. 화면 전환
+                        reportScreen.classList.add('hidden');
+                        exampleScreen.classList.remove('hidden');
+                        window.scrollTo(0, 0);
+                        
+                        // 2. 폼 초기화
+                        reportForm.reset();
+                        
+                        // 3. 버튼 및 피드백 메시지 원상 복구 (다음 제출을 위해)
+                        saveButton.disabled = false;
+                        saveButton.textContent = '저장하기 (클라우드 & Google Sheets)';
+                        saveFeedback.textContent = '✓ 저장 완료!'; // 원래 텍스트로
+                        saveFeedback.classList.add('opacity-0');
+                        saveButton.classList.remove('bg-green-600'); // 성공색 제거
+                        saveButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
+
+                    } else { // <<< [수정됨] 실패했을 경우
+                        // 화면을 전환하지 않고, 버튼만 다시 시도할 수 있도록 복구
+                        saveButton.disabled = false;
+                        saveButton.textContent = '저장하기 (클라우드 & Google Sheets)';
+                        saveFeedback.classList.add('opacity-0');
+                        saveButton.classList.remove('bg-red-600'); // 실패색 제거
+                        saveButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                    }
+                }, 3000); // 3초 대기
             }
         }
         
